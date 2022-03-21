@@ -19,6 +19,7 @@ Cloudify documentation (see [More Information](#more-information) below).
 | `variables-file` | YAML/JSON file containing template variables
 | `environment-file` | YAML/JSON file containing environment variables to pass to the Terraform process
 | `environment-mapping` | A whitespace-delimited list of strings denoting environment variables to pass through (see below)
+| `skip-apply-comment` |  boolean to control whether to add terraform apply comment to PR
 
 # Outputs
 
@@ -58,7 +59,7 @@ jobs:
 
 # More Information
 
-Refer to [Cloudify CLI Documentation](https://docs.cloudify.co/latest/cli/) for additional information about `cfy` cli command line.
+Refer to [Cloudify CLI Documentation](https://docs.cloudify.co/latest/cli/) for additional information about `cfy` command line.
 
 Refer to [Cloudify CI/CD Integration](https://docs.cloudify.co/latest/working_with/integration/) for additional information about
 Cloudify's integration with CI/CD tools.
