@@ -19,6 +19,7 @@ Cloudify documentation (see [More Information](#more-information) below).
 | `variables-file` | YAML/JSON file containing template variables
 | `environment-file` | YAML/JSON file containing environment variables to pass to the Terraform process
 | `environment-mapping` | A whitespace-delimited list of strings denoting environment variables to pass through (see below)
+| `skip-apply-comment` |  boolean to control whether to add terraform apply comment to PR
 
 # Outputs
 
