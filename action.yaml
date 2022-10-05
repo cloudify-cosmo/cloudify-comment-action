@@ -61,6 +61,10 @@ inputs:
     description: boolean to control whether to add terraform apply comment to PR
     default: "false"
     required: false
+  infracost-api-key:
+    description: infracost api key [requrired in case you want to use cost comment action]
+    default: "false"
+    required: false 
 outputs:
   result:
     description: Comment handling result
@@ -129,7 +133,7 @@ runs:
       - name: Execute terraform plan
         id: terraform_plan
         if: ${{ steps.format_comment.outputs.command == 'terraform plan' }}
-        uses: cloudify-cosmo/terraform-plan-action@v1.2
+        uses: cloudify-cosmo/terraform-plan-action@v1.3
         with:
           environment-name: ${{ inputs.environment-name }}
           environment-id: ${{ inputs.environment-id }}
@@ -164,10 +168,49 @@ runs:
               body: output
             })
 
+      - name: Execute terraform cost
+        id: terraform_cost
+        if: ${{ steps.format_comment.outputs.command == 'terraform cost' }}
+        uses: cloudify-cosmo/terraform-cost-action@v1.3
+        with:
+          environment-name: ${{ inputs.environment-name }}
+          environment-id: ${{ inputs.environment-id }}
+          labels: ${{ inputs.labels }}
+          module-file: ${{steps.check_module_path.outputs.module-file}}
+          module-source-path: ${{ inputs.module-source-path }}
+          variables-file: ${{ inputs.variables-file }}
+          environment-file: ${{ inputs.environment-file }}
+          environment-mapping: ${{ inputs.environment-mapping }}
+          api-key: ${{ inputs.infracost-api-key }}
+
+      - name: Add cost comment
+        if: ${{ inputs.github_token != '-' && steps.format_comment.outputs.command == 'terraform cost' }}
+        uses: actions/github-script@v3
+        env:
+          COST: "terraform\n${{ steps.terraform_cost.outputs.terraform-cost }}"
+        with:
+          github-token: ${{ inputs.github_token }}
+          script: |
+            const output = `#### Terraform Cost
+
+            <details><summary>Show Cost</summary>
+
+            \`\`\`\n
+            ${process.env.COST}
+            \`\`\`
+
+            </details>`;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
       - name: Execute terraform apply
         id: terraform_apply
         if: ${{ steps.format_comment.outputs.command == 'terraform apply' }}
-        uses: cloudify-cosmo/terraform-apply-action@v1.2
+        uses: cloudify-cosmo/terraform-apply-action@v1.3
         with:
           environment-name: ${{ inputs.environment-name }}
           environment-id: ${{ inputs.environment-id }}
@@ -205,7 +248,7 @@ runs:
       - name: Execute terraform destroy
         id: terraform_destroy
         if: ${{ steps.format_comment.outputs.command == 'terraform destroy' }}
-        uses: cloudify-cosmo/terraform-destroy-action@v1.2
+        uses: cloudify-cosmo/terraform-destroy-action@v1.3
         with:
           environment-name: ${{ inputs.environment-name }}
           environment-id: ${{ inputs.environment-id }}
@@ -214,7 +257,7 @@ runs:
       - name: Execute cloudify command from comment
         id: execute_command
         if: ${{ !startsWith(steps.format_comment.outputs.command, 'terraform') }}
-        uses: cloudify-cosmo/cli-action@v1.2
+        uses: cloudify-cosmo/cli-action@v1.3
         with:
           command: ${{steps.format_comment.outputs.command}}
 

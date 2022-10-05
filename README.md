@@ -20,6 +20,7 @@ Cloudify documentation (see [More Information](#more-information) below).
 | `environment-file` | YAML/JSON file containing environment variables to pass to the Terraform process
 | `environment-mapping` | A whitespace-delimited list of strings denoting environment variables to pass through (see below)
 | `skip-apply-comment` |  boolean to control whether to add terraform apply comment to PR
+| `infracost-api-key` |  Infracost API Key that would be used when invoking terraform cost-action
 
 # Outputs
 
@@ -31,7 +32,7 @@ Cloudify documentation (see [More Information](#more-information) below).
 
 * to activate the comment part correctly , the workflow should be defined on your default branch -bellow an example how to use it-
 * this action can trigger any command that you can execute using cloudify-cosmo/cli-action which interface with `cfy` cli command
-* this action handles terraform comments [`cfy terraform plan`, `cfy terraform apply`, `cfy terraform destroy`] which triggers the following actions respectively [cloudify-cosmo/terraform-plan-action, cloudify-cosmo/terraform-apply-action, cloudify-cosmo/terraform-destroy-action] , it will checkout the head branch that you opened a Poll Request from if you don't pass `module-file` value
+* this action handles terraform comments [`cfy terraform plan`, `cfy terraform cost`, `cfy terraform apply`, `cfy terraform destroy`] which triggers the following actions respectively [cloudify-cosmo/terraform-plan-action, cloudify-cosmo/terraform-apply-action, cloudify-cosmo/terraform-destroy-action] , it will checkout the head branch that you opened a Poll Request from if you don't pass `module-file` value
 
 # Example
 
@@ -46,7 +47,7 @@ jobs:
     steps:
       - name: handle comment on PR
         id: handle_comment
-        uses: cloudify-cosmo/cloudify-comment-action@v1.2
+        uses: cloudify-cosmo/cloudify-comment-action@v1.3
         with:
           comment: "${{ github.event.comment.body }}"
           github_token: "${{ secrets.GITHUB_TOKEN }}" # This token is provided by Actions, you do not need to create your own token
